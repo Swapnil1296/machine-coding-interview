@@ -1,13 +1,11 @@
-import { useState } from 'react'
-import TodoForm from './TodoApp/TodoForm.jsx'
+
 import './App.css'
+import AutoCompleteSearchSuggestions from './AutocompleteSearch/AutoCompleteSearchSuggestions'
 
 function App() {
-  const [count, setCount] = useState(0)
-
   return (
     <>
-      <TodoForm/>
+     <AutoCompleteSearchSuggestions/>
     </>
   )
 }

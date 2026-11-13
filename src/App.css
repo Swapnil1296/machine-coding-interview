@@ -1,63 +1,68 @@
-
-.container{
-    display: flex; 
+.container {
+    display: flex;
     justify-content: center;
     align-items: center;
-    flex-direction: column;
-    margin: 10px;
-    border: 1px dashed blueviolet;
+    border: 1px dashed brown;
     padding: 10px;
-    gap: 10px;
+    margin: 10px;
+    flex-direction: column;
 }
 
-.header{
-  font-size: 20px;
-  font-weight: 600;
+.input_container {
+    width: 40%;
 }
-.form_div{
-    width: 50%;
+
+.input_container form {
+    display: flex;
+    justify-content: space-between;
     align-items: center;
-    border: 1px solid rgb(48, 54, 54);
-    padding: 4px;
-    display: flex;
-    gap: 5px;
-    background-color: white;
-}
-.input_box{
-    width: 100%;
-    border: none;
-}
-.input_box :focus{
-    border: none;
-
-}
-.todo_status{
-    display: flex;
     gap: 10px;
-    font-size: 15px;
-}
-.todo_status button{
-    border: 1px solid rgb(72, 72, 93);
+    background-color: aliceblue;
+    border: 1px solid black;
     padding: 5px;
     border-radius: 5px;
-    
+
 }
-.todo_status button:hover{
+
+input {
+    outline: none;
+    border: none;
+    background-color: aliceblue;
+    width: 100%;
+}
+
+input:focus {
+    outline: none;
+    border: none;
+    box-shadow: none;
+}
+
+button:hover {
     cursor: pointer;
 }
-.todo_list_items{
-    display: flex;
-    gap: 10px;
-    border: 1px solid blueviolet;
-    padding: 5px;
-    border-radius: 5px;
-    justify-content: space-evenly;
-    width: 100%;
+
+.product_list {
+    overflow-y: scroll;
+    background-color: beige;
+    padding: 10px;
+    height: 150px;
+    max-height: 200px;
+    width: 40%;
 }
-.edit_tasks{
-    display: flex;
-    gap: 10px;
+
+.product_list li {
+
+    margin-top: 5px;
+    cursor: pointer;
 }
-.edit_tasks button{
-    border-radius: 2px;
+.active {
+    background-color: #4076e2;
+    color: #111827;
+    cursor: pointer;
+}
+
+
+.product_list li:hover {
+
+    cursor: pointer;
 }
