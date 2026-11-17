@@ -1,5 +1,6 @@
 
 import { useEffect, useState } from 'react'
+import { useDebounce } from '../hooks/useDebounce'
 
 
 
@@ -27,9 +28,9 @@ import { useEffect, useState } from 'react'
 // The API returns product information. Display the product titles as suggestions.
 
 
-const getItems = async (query) => {
-    const response = await fetch(`https://dummyjson.com/products/search?q=${encodeURIComponent(query)}`);
-    const { products } = await response.json();
+const getItems = async (query, limit = 5, skip = 0) => {
+    const response = await fetch(`https://dummyjson.com/products/search?q=${encodeURIComponent(query)}&limit=${limit}&skip=${skip}`);
+    const products = await response.json();
     return products ?? [];
 };
 
@@ -38,6 +39,12 @@ const AutoCompleteSearchSuggestions = () => {
     const [productList, setProductList] = useState(null);
     const [loader, setLoader] = useState(false);
     const [activeIndex, setActiveIndex] = useState(-1);
+    const [totalProductCount, setTotalProductCount] = useState(0);
+    const [currentPage, setCurrentPage] = useState(1)
+    const pageSize = 10;
+    const totalPages = Math?.ceil(Number(totalProductCount) / pageSize);
+    const skipPage = (currentPage - 1) * pageSize;
+
 
     const ClearSelection = () => {
         setSearchValue('');
@@ -49,35 +56,43 @@ const AutoCompleteSearchSuggestions = () => {
         event.preventDefault();
     };
 
-    useEffect(() => {
-        const query = searchValue.trim();
+    const query = searchValue.trim();
+    const debouncedQuery = useDebounce(query, 500);
 
+    useEffect(() => {
         if (!query) {
             setProductList(null);
             setLoader(false);
             return;
         }
 
+        if (query !== debouncedQuery) {
+            setLoader(true);
+            return;
+        }
+
+        let ignore = false;
         setLoader(true);
 
-        const timeoutId = setTimeout(async () => {
-            try {
-                const products = await getItems(query);
-               
-                setProductList(products.length ? products : null);
-            } catch (error) {
-              
+        getItems(debouncedQuery, pageSize, skipPage)
+            .then((products) => {
+                if (ignore) return;
+                setProductList(products?.products?.length ? products?.products : null);
+                setTotalProductCount(products?.total)
+            })
+            .catch((error) => {
+                if (ignore) return;
                 console.error("Error while fetching data", error);
                 setProductList(null);
-            } finally {
+            })
+            .finally(() => {
                 if (!ignore) setLoader(false);
-            }
-        }, 500);
+            });
 
         return () => {
-            clearTimeout(timeoutId);
+            ignore = true;
         };
-    }, [searchValue]);
+    }, [query, debouncedQuery, currentPage]);
 
     const handleKeyDown = (event) => {
         if (!productList?.length) return;
@@ -100,7 +115,6 @@ const AutoCompleteSearchSuggestions = () => {
             case "Enter":
                 if (activeIndex !== -1) {
                     event.preventDefault();
-                    console.log("productList[activeIndex]", productList[activeIndex])
                     setSearchValue(productList[activeIndex]?.title);
                 }
                 break;
@@ -113,6 +127,10 @@ const AutoCompleteSearchSuggestions = () => {
                 break;
         }
     };
+    useEffect(() => {
+    setCurrentPage(1);
+    setActiveIndex(-1);
+}, [query]);
 
     return (
         <div className='container'>
@@ -123,7 +141,8 @@ const AutoCompleteSearchSuggestions = () => {
 
                 </form>
             </div>
-            {searchValue && <SearchSuggestions productList={productList} loader={loader} setSearchValue={setSearchValue} searchValue={searchValue} activeIndex={activeIndex} />}
+            {searchValue && (<><SearchSuggestions productList={productList} loader={loader} setSearchValue={setSearchValue} searchValue={searchValue} activeIndex={activeIndex} totalProductCount={totalProductCount} /></>)}
+            {searchValue ? <PaginationComponent setCurrentPage={setCurrentPage} totalPages={totalPages} currentPage={currentPage} /> : null}
         </div>
     )
 };
@@ -131,19 +150,55 @@ const AutoCompleteSearchSuggestions = () => {
 
 const SearchSuggestions = ({ productList, loader, setSearchValue, searchValue, activeIndex }) => {
 
-    return (
-        <ul className='product_list' >
-            {loader && <li>Loading...</li>}
-            {!productList && !loader ? <li>No products found</li> : <>
-                {productList?.map((items, index) => (
 
-                    <li key={items?.id} onClick={() => setSearchValue(items?.title)} className={activeIndex === index ? "active" : ""}>{items?.title}</li>
-                ))}
-            </>
-            }
-        </ul>
+    return (
+        <>
+            <ul className='product_list' >
+                {loader && <li>Loading...</li>}
+                {!productList && !loader ? <li>No products found</li> : <>
+                    {productList?.map((items, index) => (
+
+                        <div key={items?.id} className={activeIndex === index ? " items_view active" : "items_view"} onClick={() => setSearchValue(items?.title)}>
+                            <li >{items?.title}
+                                <img src={items?.thumbnail} alt={items?.title} />
+
+                            </li>
+
+                        </div>
+                    ))}
+                </>
+                }
+
+
+            </ul>
+
+        </>
     );
 };
+export const PaginationComponent = ({ setCurrentPage, totalPages, currentPage }) => {
+    const handlePage = (value) => {
+        if (value === 'prev') {
+            setCurrentPage((prev) => (
+                prev > 1 ? prev - 1 : prev
+            ))
+        } else if (value === 'next') {
+            setCurrentPage((prev) => (prev < totalPages ? prev + 1 : prev));
+        }
+    };
+    return <>
+        <div className="pagination">
+            <div className="btn_prev" >
+                <button onClick={() => handlePage('prev')} disabled={currentPage === 1}> Prev</button>
+            </div>
+            {[...Array(totalPages)]?.map((_, index) => (
+                <div className="number_list" key={index} onClick={() => setCurrentPage(index + 1)}>{index + 1}</div>
+            ))}
+            <div className="btn_next" >
+                <button onClick={() => handlePage('next')} disabled={currentPage === totalPages}>  Next</button>
+            </div>
+        </div>
+    </>
+}
 
 export default AutoCompleteSearchSuggestions
 

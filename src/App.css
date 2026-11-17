@@ -42,18 +42,20 @@ button:hover {
 }
 
 .product_list {
-    overflow-y: scroll;
+    /* overflow-y: scroll; */
     background-color: beige;
     padding: 10px;
-    height: 150px;
-    max-height: 200px;
+    height: 100%;
     width: 40%;
+    margin-top: 10px;
+    border-radius: 5px;
 }
 
 .product_list li {
-
     margin-top: 5px;
     cursor: pointer;
+    padding: 10px;
+    border: 1px dashed da;
 }
 .active {
     background-color: #4076e2;
@@ -62,7 +64,50 @@ button:hover {
 }
 
 
-.product_list li:hover {
+.items_view,.number_list,.product_list li:hover {
 
     cursor: pointer;
+}
+
+.items_view{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    
+}
+.items_view >li{
+    background-color: white;
+    margin-top: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+    width: 100%;
+}
+ li >img{
+    width: 70px;
+    height: 70px;
+    object-fit: contain;
+}
+.pagination{
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+}
+.number_list{
+  background-color: aqua;
+    border: 1px solid black;
+    padding: 4px;
+    border-radius: 5px;
+}
+.btn_prev,.btn_next{
+    background-color: aqua;
+    border: 1px solid black;
+    padding: 4px;
+    border-radius: 5px;
+}
+ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
 }
