@@ -1,15 +1,9 @@
-import { useState } from 'react'
-import TodoForm from './TodoApp/TodoForm.jsx'
-import './App.css'
+import MultiStepUserRegistrationForm from './MultiStepRegistration/MultiStepUserRegistrationForm'
+
+import "./App.css";
 
 function App() {
-  const [count, setCount] = useState(0)
-
-  return (
-    <>
-      <TodoForm/>
-    </>
-  )
+  return <><MultiStepUserRegistrationForm /></>;
 }
 
-export default App
+export default App;
