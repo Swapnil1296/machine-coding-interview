@@ -10,15 +10,20 @@
     display: flex;
     align-items: stretch;
 }
+/* Right side of the page: stepper on top, form underneath. */
+.form_panel {
+    width: 70%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
 .progressbar {
     display: flex;
-    width: 70%;
+    width: 100%;
     box-sizing: border-box;
     padding-inline: 56px;
     align-items: center;
     justify-content: center;
-    /* The side list is taller, so the row stretches. This keeps the stepper at the top instead of the vertical middle. */
-    align-self: flex-start;
     margin-top: 12px;
 }
 .steps_bar {
@@ -150,14 +155,13 @@
     width: 100%;
     background-color: blue;
 }
-.personal_info{
-width: 100%;
-display: flex;
-align-items: center;
-justify-content: center;
-
+.personal_info ,.address_details{
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    margin-top: 28px;
 }
-.info_form{
+.info_form,.address_form{
  width: 50%;
  border: 1px dashed rgb(44, 56, 65);
  padding: 20px;
@@ -200,4 +204,14 @@ input[type="number"]::-webkit-outer-spin-button {
   margin: 0;
 }
 
+.error_message{
+  margin: 0;
+    color: rgb(211, 31, 31);
+    font-size: 10px;
+}
 
+.btn_group{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
