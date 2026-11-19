@@ -1,4 +1,3 @@
-import { json } from 'node:stream/consumers';
 import { useEffect, useReducer, useState } from 'react'
 const steps = ['Personal information', 'Address details', 'Account details', 'Review and submit'];
 const fields = [{
@@ -90,8 +89,8 @@ const fillPercent = (index, currentStep) => {
 }
 const intialState = {
     personal_info: { first_name: '', last_name: '', dob: '', email: '', phone_number: '' },
-    address_details: {},
-    account_details: {},
+    address_details: { country: '', state: '', city: '', street_name: '', postal_code: '' },
+    account_details: { username: '', password: '', confirm_password: '', terms: false },
     errors: {},
     statue: 'idle',
 };
@@ -107,12 +106,12 @@ function reducer(state, action) {
         case "ADDRESS_DETAILS_CHANGE":
             return {
                 ...state, address_details: { ...state?.address_details, [action.field]: action.value },
-                errors: { ...state.erros, [action.field]: '' }
+                errors: { ...state.errors, [action.field]: '' }
             };
         case "ACCOUNT_DETAILS_CHANGE":
             return {
                 ...state, account_details: { ...state?.account_details, [action.field]: action.value },
-                errors: { ...state.erros, [action.field]: '' }
+                errors: { ...state.errors, [action.field]: '' }
             };
         case "ERRORS":
             return { ...state, errors: action.errors };
@@ -358,7 +357,7 @@ const AddressDetails = ({ setCurrentStep, currentStep, handleBack, state, dispat
                         <div className="info_input" key={field?.key}>
                             <span>{field?.name}</span>
 
-                            <input type={field?.type} name={field?.key} value={address_details[field?.key]} autoComplete='new-password' onChange={(e) => handleChange(e)} />
+                            <input type={field?.type} name={field?.key} value={address_details?.[field?.key] ?? ''} autoComplete='new-password' onChange={(e) => handleChange(e)} />
                             {errors?.[field.key] && <p className='error_message'>{errors[field.key]}</p>}
                         </div>
                     ))}
@@ -379,6 +378,7 @@ const AccountDetails = ({ setCurrentStep, currentStep, handleBack, state, dispat
         const err = validate();
         if (Object.keys(err).length) {
             dispatch({ type: "ERRORS", errors: err })
+            return
         }
         localStorage.setItem("account_details", JSON.stringify(account_details));
         dispatch({ type: "SUCCESS" });
@@ -390,21 +390,20 @@ const AccountDetails = ({ setCurrentStep, currentStep, handleBack, state, dispat
     const validate = () => {
         let errs = {};
         if (!account_details?.terms) {
-            errs.user_terms = 'Please accept terms & conditions.'
+            errs.terms = 'Please accept terms & conditions.'
         };
         if (!account_details?.username?.trim()) {
             errs.username = "Username is required."
-        };
-        if (userNameRegex.test(account_details?.username?.trim())) {
+        } else if (!userNameRegex.test(account_details.username.trim())) {
             errs.username = "User name should be mix of characters."
-        };
+        }
 
-        if (!account_details?.password?.trim()) {
+        const password = account_details?.password?.trim() ?? ''
+        if (!password) {
             errs.password = "Password is required."
-        };
-        if (passwordRegex.test(account_details?.password?.trim())) {
-            errs.password = "Enter a valid Password"
-        };
+        } else if (!passwordRegex.test(password)) {
+            errs.password = "Enter a valid Password (6–20 chars, ≥1 uppercase, ≥1 lowercase, ≥1 digit, ≥1 special char e.g Passw0rd!)"
+        }
         if (!account_details?.confirm_password?.trim()) {
             errs.confirm_password = "Password is required."
         };
@@ -430,7 +429,15 @@ const AccountDetails = ({ setCurrentStep, currentStep, handleBack, state, dispat
                         <div className="info_input" key={field?.key}>
                             <span>{field?.name}</span>
 
-                            <input type={field?.type} name={field?.key} value={account_details[field?.key]} autoComplete='new-password' onChange={(e) => handleChange(e)} />
+                            <input
+                                type={field?.type}
+                                name={field?.key}
+                                autoComplete='new-password'
+                                onChange={(e) => handleChange(e)}
+                                {...(field?.type === 'checkbox'
+                                    ? { checked: Boolean(account_details?.[field?.key]) }
+                                    : { value: account_details?.[field?.key] ?? '' })}
+                            />
                             {errors?.[field.key] && <p className='error_message'>{errors[field.key]}</p>}
                             {field?.type === 'checkbox' && field?.user_terms ? <p> {field?.user_terms}</p> : null}
                         </div>
