@@ -135,13 +135,14 @@ const MultiStepUserRegistrationForm = () => {
 
     return (
         <>
-            <div className='container'>
+        <div className='container'>
                 <LeftNav currentStep={currentStep} />
                 <div className="form_panel">
                     <ProgressBar currentStep={currentStep} setCurrentStep={setCurrentStep} />
                     {currentStep == 0 && <PersonalInfo setCurrentStep={setCurrentStep} state={state} dispatch={dispatch} />}
                     {currentStep == 1 && <AddressDetails setCurrentStep={setCurrentStep} currentStep={currentStep} handleBack={handleBack} state={state} dispatch={dispatch} />}
                     {currentStep == 2 && <AccountDetails setCurrentStep={setCurrentStep} currentStep={currentStep} handleBack={handleBack} state={state} dispatch={dispatch} />}
+                    {currentStep ===3 && <ReveiwSubmission  setCurrentStep={setCurrentStep} currentStep={currentStep} handleBack={handleBack} state={state} dispatch={dispatch}/>}
                 </div>
 
             </div>
@@ -167,7 +168,7 @@ const VerticalProgressBar = ({ currentStep }) => {
                 <div className="vertical_step" key={name}>
                     <div className="vertical_step_track">
                         <div className={index <= currentStep ? 'vertical_progress_list circle_active' : 'vertical_progress_list'}>
-                            <span>{index + 1}</span>
+                        <span>{index + 1}</span>
                         </div>
                         {index < steps.length - 1 && (
                             <div className="vertical_progress_bar_container">
@@ -451,4 +452,67 @@ const AccountDetails = ({ setCurrentStep, currentStep, handleBack, state, dispat
         </div>
     )
 };
+const ReveiwSubmission = ({currentStep,handleBack ,state,dispatch}) => {
+    const AllFields = [...fields, ...addressFields, ...accoutnFields];
+    const { personal_info, address_details, account_details, errors, status } = state;
+    const savedFields = (section) => {
+        const nested = Object.values(section).find((value) => value && typeof value === 'object');
+        return nested ?? section;
+    };
+    const allFieldInfo = [{
+        ...savedFields(personal_info),
+        ...savedFields(address_details),
+        ...savedFields(account_details),
+    }];
+    
+    const handleSubmit = (e) => {
+        e.preventDefault();
+    };
+    useEffect(() => {
+        const savedPersonalInfo = localStorage.getItem('personal_info');
+        const savedAddressDetails = localStorage.getItem('address_details');
+      const savedAccountDetails = localStorage.getItem('account_details');
+      if (!savedPersonalInfo || !savedAddressDetails || !savedAccountDetails) return;
+        Object.entries(JSON.parse(savedPersonalInfo)).forEach(([field, value]) => {
+            dispatch({ type: "PERSONAL_INFO_CHANGE", field, value });
+        });
+        Object.entries(JSON.parse(savedAddressDetails)).forEach(([field, value]) => {
+            dispatch({ type: "ADDRESS_DETAILS_CHANGE", field, value });
+        });
+        Object.entries(JSON.parse(savedAccountDetails)).forEach(([field, value]) => {
+            dispatch({ type: "ACCOUNT_DETAILS_CHANGE", field, value });
+        }); 
+      
+    },[])
+    return (
+        <div className="address_details">
+            <div className='address_form'>
+                <form onSubmit={handleSubmit}>
+                    {AllFields && AllFields?.map((field, index) => (
+                        <div className="info_input" key={field?.key}>
+                            <span>{field?.name}</span>
+
+                            <input
+                                type={field?.type}
+                                name={field?.key}
+                          autoComplete='new-password'
+                        disabled
+                                {...(field?.type === 'checkbox'
+                                    ? { checked: Boolean(allFieldInfo[0]?.[field?.key]) }
+                                    : { value: allFieldInfo[0]?.[field?.key] ?? '' })}
+                                
+                            />
+                            {/* {errors?.[field.key] && <p className='error_message'>{errors[field.key]}</p>} */}
+                            {field?.type === 'checkbox' && field?.user_terms ? <p> {field?.user_terms}</p> : null}
+                        </div>
+                    ))}
+                    <div className='btn_group'>
+                        {currentStep > 0 ? <button type='submit' className='submit_btn' onClick={handleBack}>Back</button> : null}
+                        <button type='submit' className='submit_btn'>Submit</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    )
+}
 export default MultiStepUserRegistrationForm
