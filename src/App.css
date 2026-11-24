@@ -1,132 +1,105 @@
-.container{
-    width: 80%;
-    border: 1px dashed black;
-    margin: auto;
-    padding: 10px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    gap: 10px;
-}
-
-
-.add_comment ,.comment_container{
-    display: flex;
-    gap: 10px;
-    justify-content: center;
-    align-items: center;
-     width: 100%;
-
-}
-.input_form{
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 10px;
-    width: 60%;
-
-}
-.input_form button{
- padding: 10px;
- border-radius: 10px;
-  font-weight: 600;
-  outline: none;
-  border-color: #1a1a1a;
-  box-shadow: none;
-}
-button:hover{
-    cursor: pointer;
-    background-color: blue;
-    font-weight: 600;
-}
-#comment{
-    width: 100%;
-  min-height: 100px;
-  padding: 12px 14px;
-  font-size: 16px;
-  line-height: 1.5;
-  color: #1a1a1a;
-  background: #f5f6f8;
-  border: 1px solid #e2e5ea;
-  border-radius: 10px;
-  transition: border-color .15s, box-shadow .15s, background .15s;
-}
-
-textarea {
-  appearance: none;          /* removes native look (also -webkit- for older Safari) */
-  -webkit-appearance: none;
-  border: 0;
-  outline: none;
-  background: transparent;
-  border: 1px solid grey;
-  font: inherit;             /* default is monospace, so inherit from the page */
-  color: inherit;
-  margin: 0;
-  padding: 0;
-  resize: none;              /* hides the drag handle */
-  border-radius: 0;
-  height: 10vh;
-
-}
-.comment_container{
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    align-items: start;
-    justify-content: space-between;
-    border: 1px solid black;
-     width: 60%;
-     padding: 20px;
-     background: #f5f6f8;
-     border: 1px solid #e2e5ea;
-  border-radius: 10px;
-  transition: border-color .15s, box-shadow .15s, background .15s;
-}
-.comments_sections{
-   background-color: cyan;
-   border: 1px solid #e2e5ea;
-  border-radius: 10px;
-  transition: border-color .15s, box-shadow .15s, background .15s;
-  padding: 10px;
-
-}
-.user_profile{
-    background-color: beige;
-    border-radius: 50%;
-    width: 20px;
-    height: 20px;
-    text-align: center;
-    padding: 5px;
-    margin-bottom: 5px;
-}
-.likes_counter{
-    display: flex;
-    justify-content: end;
-    align-items: center;
-    gap: 2px;
-
-}
-.replies{
-    
-    color: rgb(94, 94, 229);
-}
-.replies:hover{
-    cursor: pointer;
-}
-.replies_container{
-    display: flex;
-    gap: 10px;
+/* ---------- Page ---------- */
+.comments-app {
+    max-width: 700px;
+    margin: 20px auto;
+    padding: 16px;
+    background: #f5f6f8;
+    border: 1px solid #e2e5ea;
+    border-radius: 10px;
     font-family: sans-serif;
-    justify-content:space-between;
-    align-items: center;
-    padding: 5px;
-    width:25%;
-    
 }
-.replies_container button{
-    border-radius: 50%;
-    outline: none;
-    text-align: center;
+
+.comments-empty {
+    color: #666;
+}
+
+/* ---------- Form (new comment, reply, edit) ---------- */
+.comment-form {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin: 8px 0;
+}
+
+.comment-form textarea {
+    width: 100%;
+    box-sizing: border-box; /* padding stays inside the 100% width */
+    padding: 8px;
+    font: inherit;
+    border: 1px solid #b5bac2;
+    border-radius: 8px;
+    resize: vertical;
+}
+
+.comment-error {
+    margin: 0;
+    color: #c0392b;
+    font-size: 14px;
+}
+
+.comment-buttons {
+    display: flex;
+    gap: 8px;
+}
+
+/* ---------- One comment ---------- */
+.comment {
+    margin-top: 10px;
+}
+
+.comment-box {
+    padding: 10px;
+    background: white;
+    border: 1px solid #e2e5ea;
+    border-radius: 8px;
+}
+
+.comment-author {
     font-weight: 600;
+}
+
+.comment-edited {
+    font-weight: normal;
+    font-size: 13px;
+    color: #777;
+}
+
+.comment-text {
+    margin: 6px 0;
+    white-space: pre-wrap; /* keeps the line breaks the user typed */
+}
+
+.comment-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+/* ---------- Nested replies ---------- */
+/* Each level moves right a little and gets a line on the left,
+   so the thread structure is easy to see at any depth. */
+.comment-replies {
+    margin-left: 20px;
+    padding-left: 12px;
+    border-left: 2px solid #d0d5dd;
+}
+
+/* ---------- Buttons ---------- */
+.comments-app button {
+    padding: 4px 10px;
+    font: inherit;
+    font-size: 14px;
+    background: white;
+    border: 1px solid #b5bac2;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.comments-app button:hover:not(:disabled) {
+    background: #eef1f5;
+}
+
+.comments-app button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
 }
