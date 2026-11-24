@@ -1,0 +1,135 @@
+.container{
+    display: grid;
+    width: 100%;
+    grid-template-columns: 1fr 2fr;
+   /* gap: 10px; */
+
+
+}
+.left_container{
+    background-color: #5B91A3;
+   
+}
+.right_container{
+    background-color: #CFEAE0;
+    border: 1px solid black;
+    
+   
+}
+.nav{
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: start;
+}
+.search{
+    padding: 10px;
+    margin: auto;
+    width: 100%;
+}
+.search>input{
+    width: 80%;
+    outline: none;
+    border: none;
+    padding: 10px;
+    border-radius: 12px;
+}
+.nav_items:hover{
+    cursor: pointer;
+}
+.heading{
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    padding: 20px;
+   
+}
+.heading > span:first-child{
+    font-size: 20px;
+    font-weight: 600;
+}
+.border{
+ border-bottom: 1px solid black;
+ margin-bottom: 10px;
+}
+#drop-zone {
+  border: 2px dashed #999;
+  border-radius: 8px;
+  padding: 48px;
+  text-align: center;
+  margin: auto;
+  width: 40%;
+  transition: background 0.2s, border-color 0.2s;
+}
+#file-list{
+  padding: 48px;
+  text-align: center;
+  margin: auto;
+  /* width: 40%; */
+  transition: background 0.2s, border-color 0.2s;  
+   
+}
+#file-list li {
+    padding: 10px;
+    border: 1px  solid brown;
+   
+    
+}
+#file-list li button{
+    height: 40px;
+    width:40px;
+}
+.upload{
+ display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+}
+#drop-zone.dragover {
+  background: #e0e7ff;
+  border-color: #4f46e5;
+}
+
+#drop-zone label {
+  color: #4f46e5;
+  text-decoration: underline;
+  cursor: pointer;
+}
+#drop-zone:hover{
+    cursor: pointer;
+}
+#drop-zone p:nth-child(2){
+    color: crimson;
+}
+button:hover{
+    cursor: pointer;
+}
+
+
+
+.thumb{
+    height: 200px;
+    width: 200px;
+    object-fit: contain;
+}
+.progress{
+    height: 5px;
+    border: 1px solid black;
+    border-radius: 20px;
+    width: 100%;
+    margin-top: 10px;
+   
+}
+.bar{
+ background-color: rgb(24, 24, 26);
+ height: inherit;
+}
+.info{
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    align-items: center;
+}
+
