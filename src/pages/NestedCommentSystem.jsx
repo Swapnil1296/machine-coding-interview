@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { memo, useMemo, useState } from "react";
 
 // There is no login in this app, so every new comment, like and edit
 // is done by this one user.
@@ -103,25 +103,68 @@ const createComment = (text) => ({
 
 // Find the comment with this id (at any depth) and replace it with
 // whatever the `change` function returns. All other comments stay the same.
+// const updateComment = (list, id, change) => {
+//   return list.map((comment) => {
+//     if (comment.id === id) {
+//       return change(comment);
+//     }
+//     // Not this one, so look inside its replies.
+//     return { ...comment, replies: updateComment(comment.replies, id, change) };
+//   });
+// };
+
+// Better version: only the comments on the path to the changed comment are copied.
+// Every other comment keeps its OLD object, so React.memo can see "nothing changed"
+// (same object as before) and skip re-rendering it.
 const updateComment = (list, id, change) => {
-  return list.map((comment) => {
-    if (comment.id === id) {
-      return change(comment);
-    }
-    // Not this one, so look inside its replies.
-    return { ...comment, replies: updateComment(comment.replies, id, change) };
+  let changed = false;
+
+  const updatedList = list.map((comment) => {
+      if (comment.id === id) {
+          changed = true;
+          return change(comment);
+      }
+
+      const updatedReplies = updateComment(comment.replies, id, change);
+
+      if (updatedReplies === comment.replies) {
+          return comment;
+      }
+
+      changed = true;
+
+      return {
+          ...comment,
+          replies: updatedReplies
+      };
   });
+
+  return changed ? updatedList : list;
 };
 
 // Remove the comment with this id (at any depth).
 // Its replies are removed with it, because they live inside it.
+// Like updateComment, comments that did not change keep their old object.
 const removeComment = (list, id) => {
-  return list
-    .filter((comment) => comment.id !== id)
-    .map((comment) => ({
-      ...comment,
-      replies: removeComment(comment.replies, id),
-    }));
+  let changed = false;
+  const newList = [];
+
+  for (const comment of list) {
+    if (comment.id === id) {
+      changed = true; // skip it, so it is not added to the new list
+      continue;
+    }
+
+    const newReplies = removeComment(comment.replies, id);
+    if (newReplies === comment.replies) {
+      newList.push(comment); // nothing changed inside, reuse as it is
+    } else {
+      changed = true;
+      newList.push({ ...comment, replies: newReplies });
+    }
+  }
+
+  return changed ? newList : list;
 };
 
 // Count ALL replies under a comment: children, grandchildren, and so on.
@@ -146,67 +189,70 @@ const NestedCommentSystem = () => {
     setComments((prev) => [createComment(text), ...prev]);
   };
 
-  // B. Add a reply under the parent comment. This works for any depth,
-  //    because updateComment can find the parent anywhere in the tree.
-  //    We also expand the parent so the new reply is visible.
-  const addReply = (parentId, text) => {
-    setComments((prev) =>
-      updateComment(prev, parentId, (parent) => ({
-        ...parent,
-        isCollapsed: false,
-        replies: [...parent.replies, createComment(text)],
-      })),
-    );
-  };
+  // The actions for each Comment are bundled into one `actions` object.
+  //
+  // useMemo with [] builds this object ONCE and gives back the same object on
+  // every render. That matters for React.memo: if `actions` were a new object
+  // each render, every Comment would see a "changed" prop and re-render anyway.
+  // It is safe to build it once, because the functions only call setComments
+  // (which never changes) and use "prev" to get the latest comments.
+  const actions = useMemo(
+    () => ({
+      // B. Add a reply under the parent comment. This works for any depth,
+      //    because updateComment can find the parent anywhere in the tree.
+      //    We also expand the parent so the new reply is visible.
+      addReply: (parentId, text) => {
+        setComments((prev) =>
+          updateComment(prev, parentId, (parent) => ({
+            ...parent,
+            isCollapsed: false,
+            replies: [...parent.replies, createComment(text)],
+          })),
+        );
+      },
 
-  // C. Change the text of a comment. Its replies are not touched.
-  const editComment = (id, text) => {
-    setComments((prev) =>
-      updateComment(prev, id, (comment) => ({
-        ...comment,
-        text: text,
-        isEdited: comment.isEdited || comment.text !== text,
-      })),
-    );
-  };
+      // C. Change the text of a comment. Its replies are not touched.
+      editComment: (id, text) => {
+        setComments((prev) =>
+          updateComment(prev, id, (comment) => ({
+            ...comment,
+            text: text,
+            isEdited: comment.isEdited || comment.text !== text,
+          })),
+        );
+      },
 
-  // D. Delete a comment and everything under it.
-  const deleteComment = (id) => {
-    setComments((prev) => removeComment(prev, id));
-  };
+      // D. Delete a comment and everything under it.
+      deleteComment: (id) => {
+        setComments((prev) => removeComment(prev, id));
+      },
 
-  // E. Like if the user has not liked yet, unlike if they have.
-  //    likedBy is a list of names, so one user can never be in it twice.
-  const toggleLike = (id) => {
-    setComments((prev) =>
-      updateComment(prev, id, (comment) => {
-        const alreadyLiked = comment.likedBy.includes(CURRENT_USER);
-        const newLikedBy = alreadyLiked
-          ? comment.likedBy.filter((user) => user !== CURRENT_USER)
-          : [...comment.likedBy, CURRENT_USER];
-        return { ...comment, likedBy: newLikedBy };
-      }),
-    );
-  };
+      // E. Like if the user has not liked yet, unlike if they have.
+      //    likedBy is a list of names, so one user can never be in it twice.
+      toggleLike: (id) => {
+        setComments((prev) =>
+          updateComment(prev, id, (comment) => {
+            const alreadyLiked = comment.likedBy.includes(CURRENT_USER);
+            const newLikedBy = alreadyLiked
+              ? comment.likedBy.filter((user) => user !== CURRENT_USER)
+              : [...comment.likedBy, CURRENT_USER];
+            return { ...comment, likedBy: newLikedBy };
+          }),
+        );
+      },
 
-  // F. Hide or show the replies of a comment.
-  const toggleCollapse = (id) => {
-    setComments((prev) =>
-      updateComment(prev, id, (comment) => ({
-        ...comment,
-        isCollapsed: !comment.isCollapsed,
-      })),
-    );
-  };
-
-  // Bundle the actions so we can hand them down in one prop.
-  const actions = {
-    addReply,
-    editComment,
-    deleteComment,
-    toggleLike,
-    toggleCollapse,
-  };
+      // F. Hide or show the replies of a comment.
+      toggleCollapse: (id) => {
+        setComments((prev) =>
+          updateComment(prev, id, (comment) => ({
+            ...comment,
+            isCollapsed: !comment.isCollapsed,
+          })),
+        );
+      },
+    }),
+    [],
+  );
 
   // Total number of comments, including all replies (for the heading).
   const totalComments = comments.reduce(
@@ -293,7 +339,10 @@ const CommentForm = ({
 /* Comment: shows one comment and calls itself for each of its replies */
 /* ------------------------------------------------------------------ */
 
-const Comment = ({ comment, actions }) => {
+// memo() makes React skip re-rendering a Comment when its props (comment and
+// actions) are the same as last time. So when you like one comment, only that
+// comment and the ones above it on its path re-render, not every comment on the page.
+const Comment = memo(({ comment, actions }) => {
   // These only control what THIS comment shows, so they stay in this component.
   const [isReplying, setIsReplying] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
@@ -391,6 +440,6 @@ const Comment = ({ comment, actions }) => {
       )}
     </div>
   );
-};
+});
 
 export default NestedCommentSystem;
