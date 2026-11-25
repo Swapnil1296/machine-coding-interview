@@ -1,0 +1,109 @@
+.container {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  background-color: aliceblue;
+  border: 1px dashed black;
+  padding: 15px;
+  width: calc(100% - 45px);   /* needs spaces around the minus */
+}
+
+.board_column {
+  padding: 10px;
+  text-align: center;
+  border: 1px solid black;
+}
+.board{
+/* text-align: center; */
+padding: 10px;
+border-left: 1px solid black;
+border-right: 1px solid black;
+border-bottom: 1px solid black;
+}
+.task_card{
+    background-color: cyan;
+    padding: 10px;
+    display: flex;
+    flex-direction: column  ;
+    gap: 10px;
+    border-radius: 10px;
+    margin-top: 10px;
+}
+.task_card:hover{
+  box-shadow: 
+    0 2px 4px rgba(0, 0, 0, 0.06),
+    0 12px 24px rgba(0, 0, 0, 0.12); 
+    cursor: pointer;
+}
+.task_first {
+   display: flex;
+    flex-direction: column  ;
+    gap: 5px;  
+}
+.task_first span:first-child{
+    font-size: 14px;
+    font-weight: 600;
+    font-family: sans-serif;
+    color: rgb(28, 91, 218);
+}
+.task_label{
+    background-color: rgb(166, 147, 123);
+    width: 20%;
+    padding:2px ;
+    text-align: center;
+    border-radius: 20px;
+    
+}
+.task_status{
+    background-color: rgb(173, 161, 145);
+    width: 20%;
+    padding:2px ;
+    text-align: center;
+    border-radius: 20px;
+    
+}
+.task_priority{
+    background-color: rgb(150, 94, 21);
+    width: 20%;
+    padding:2px ;
+    text-align: center;
+    border-radius: 20px;
+    
+}
+.task_label span{
+    color: black !important;
+}
+.task_second{
+    display: flex;
+    gap: 10px;
+    justify-content: space-between;
+}
+.column_container{
+    display: flex;
+    gap: 5px;
+    align-items: center;
+    justify-content: center;
+}
+.column_container button{
+    padding: 5px;
+    font-size: 10px;
+    font-weight: 600;
+    background-color: aqua;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    text-align: center;
+}
+select,button{
+    border: none;
+    outline: none;
+}
+button:hover{
+    cursor: pointer;
+}
+select:hover{
+    cursor: pointer;
+    outline: none;
+    border: none;
+    
+}
