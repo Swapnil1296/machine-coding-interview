@@ -1,11 +1,14 @@
 .container {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  /* minmax(0, 1fr): a plain 1fr cannot shrink below its content, so a wide header
+     pushed the 4th column off the screen. 0 lets all 4 columns share the width equally. */
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 10px;
   background-color: aliceblue;
   border: 1px dashed black;
   padding: 15px;
-  width: calc(100% - 45px);   /* needs spaces around the minus */
+  box-sizing: border-box;   /* padding and border are counted inside the width below */
+  width: calc(100% - 20px);   /* needs spaces around the minus */
 }
 
 .board_column {
@@ -48,23 +51,28 @@ border-bottom: 1px solid black;
 }
 .task_label{
     background-color: rgb(166, 147, 123);
-    width: 20%;
-    padding:2px ;
+    width: fit-content;   /* the pill grows with its text (a fixed 20% was too small for "IN PROGRESS") */
+    padding-inline: 8px;
+    padding:5px ;
     text-align: center;
     border-radius: 20px;
     
 }
 .task_status{
     background-color: rgb(173, 161, 145);
-    width: 20%;
-    padding:2px ;
+    width: fit-content;
+    white-space: nowrap;
+    padding-inline: 8px;
+    padding:5px ;
     text-align: center;
     border-radius: 20px;
+    font-size: 10px;
     
 }
 .task_priority{
     background-color: rgb(150, 94, 21);
-    width: 20%;
+    width: fit-content;
+    padding-inline: 8px;
     padding:2px ;
     text-align: center;
     border-radius: 20px;
@@ -73,8 +81,13 @@ border-bottom: 1px solid black;
 .task_label span{
     color: black !important;
 }
+.task_priority span{
+    text-transform: capitalize; /* "high" is stored in lowercase, show it as "High" */
+}
 .task_second{
     display: flex;
+    flex-wrap: wrap;      /* in a narrow column, move items to the next line instead of overflowing the card */
+    align-items: center;  /* keep the pills their own height instead of stretching to the tallest item */
     gap: 10px;
     justify-content: space-between;
 }
@@ -106,4 +119,51 @@ select:hover{
     outline: none;
     border: none;
     
+}
+.priority_filter{
+    display: flex;
+    flex-wrap: wrap;      /* with several filter groups, let them move to a second line */
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 16px;
+    width: 100%;
+
+
+}
+.priority_filter_container{
+ background-color: aliceblue;
+  border: 1px dashed black;
+  padding: 15px;
+  box-sizing: border-box;   
+  width: calc(100% - 20px); 
+  display: flex; 
+  align-items: center;
+  justify-content: center;
+}
+
+.filter_date ,.filter_labels,.filter_options,.filter_group{
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+.filter_title{
+    font-size: 12px;
+}
+.filter_checks{
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+.check_item{
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    font-size: 14px;
+}
+.board_empty{
+    text-align: center;
+    color: #555;
+}
+label{
+    font-size: 12px;
 }
